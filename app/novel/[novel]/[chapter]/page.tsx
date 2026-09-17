@@ -1,6 +1,18 @@
-import Link from 'next/link';
-import { getChapter, getNovelMeta, getNovelChapters, getAllNovelSlugs, getAllChapterSlugs } from '@/lib/content';
-import { notFound } from 'next/navigation';
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ReadingProgress } from "@/components/reading-progress";
+import {
+  getAllChapterSlugs,
+  getAllNovelSlugs,
+  getChapter,
+  getNovelChapters,
+  getNovelMeta,
+} from "@/lib/content";
+
+type ChapterPageProps = {
+  params: Promise<{ novel: string; chapter: string }>;
+};
 
 export function generateStaticParams() {
   const params: { novel: string; chapter: string }[] = [];
@@ -12,54 +24,66 @@ export function generateStaticParams() {
   return params;
 }
 
-export default async function ChapterPage({ params }: { params: { novel: string; chapter: string } }) {
-  const meta = getNovelMeta(params.novel);
+export async function generateMetadata({ params }: ChapterPageProps): Promise<Metadata> {
+  const { novel, chapter: chapterSlug } = await params;
+  const meta = getNovelMeta(novel);
+  const chapter = await getChapter(novel, chapterSlug);
+  if (!meta || !chapter) return {};
+
+  const title = `${chapter.title}｜${meta.title}`;
+  const description = `阅读《${meta.title}》${chapter.title}。`;
+  const url = `/novel/${novel}/${chapterSlug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: { title, description, url },
+  };
+}
+
+export default async function ChapterPage({ params }: ChapterPageProps) {
+  const { novel, chapter: chapterSlug } = await params;
+  const meta = getNovelMeta(novel);
   if (!meta) notFound();
 
-  const chapter = await getChapter(params.novel, params.chapter);
+  const chapter = await getChapter(novel, chapterSlug);
   if (!chapter) notFound();
 
-  const chapters = getNovelChapters(params.novel);
-  const currentIndex = chapters.findIndex(ch => ch.slug === params.chapter);
-  const prev = currentIndex > 0 ? chapters[currentIndex - 1] : null;
-  const next = currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
+  const chapters = getNovelChapters(novel);
+  const currentIndex = chapters.findIndex((item) => item.slug === chapterSlug);
+  const previousChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
+  const nextChapter = currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
 
   return (
-    <article style={{ maxWidth: 680, margin: '0 auto', padding: '8rem 2rem 5rem', minHeight: '100vh' }}>
-      <div style={{ marginBottom: '3rem', paddingBottom: '2rem', borderBottom: '1px solid var(--gray-100)' }}>
-        <Link href={`/novel/${params.novel}`} className="back-link">← 返回目录</Link>
-        <p style={{
-          fontSize: '0.72rem',
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          color: 'var(--sakura-400)',
-          marginBottom: '0.6rem',
-        }}>
-          {meta.title}
-        </p>
-        <h1 style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '2.2rem',
-          fontWeight: 400,
-        }}>
-          {chapter.title}
-        </h1>
-      </div>
+    <>
+      <ReadingProgress />
+      <main id="main-content">
+        <article className="article-shell article-shell--novel">
+          <header className="article-header">
+            <Link href={`/novel/${novel}`} className="back-link">返回目录</Link>
+            <p className="article-kicker">{meta.title}</p>
+            <h1>{chapter.title}</h1>
+          </header>
 
-      <div className="prose novel-prose" dangerouslySetInnerHTML={{ __html: chapter.content }} />
+          <div className="prose novel-prose" dangerouslySetInnerHTML={{ __html: chapter.content }} />
 
-      <div className="chapter-nav">
-        {prev ? (
-          <Link href={`/novel/${params.novel}/${prev.slug}`}>← {prev.title}</Link>
-        ) : (
-          <span />
-        )}
-        {next ? (
-          <Link href={`/novel/${params.novel}/${next.slug}`}>{next.title} →</Link>
-        ) : (
-          <span />
-        )}
-      </div>
-    </article>
+          <nav className="chapter-nav" aria-label="章节导航">
+            {previousChapter ? (
+              <Link href={`/novel/${novel}/${previousChapter.slug}`} rel="prev">
+                <span>上一章</span>
+                <strong>{previousChapter.title}</strong>
+              </Link>
+            ) : <span />}
+            {nextChapter ? (
+              <Link href={`/novel/${novel}/${nextChapter.slug}`} rel="next">
+                <span>下一章</span>
+                <strong>{nextChapter.title}</strong>
+              </Link>
+            ) : <span />}
+          </nav>
+        </article>
+      </main>
+    </>
   );
 }
