@@ -51,7 +51,7 @@ describe("content repository", () => {
     const sodoma = novels.find((novel) => novel.slug === "sodoma");
 
     expect(novels).toHaveLength(2);
-    expect(sodoma).toMatchObject({ title: "樱色匿名信", chapterCount: 3 });
+    expect(sodoma).toMatchObject({ title: "无神之明", chapterCount: 3 });
     expect(sodoma?.wordCount).toMatch(/^约 /);
   });
 
@@ -77,7 +77,7 @@ describe("content repository", () => {
   it("lists novel and chapter slugs", () => {
     expect(getAllNovelSlugs()).toEqual(expect.arrayContaining(["sodoma", "spring-tide"]));
     expect(getAllChapterSlugs("sodoma")).toEqual(expect.arrayContaining(["001", "002", "003"]));
-    expect(getNovelMeta("sodoma")?.title).toBe("樱色匿名信");
+    expect(getNovelMeta("sodoma")?.title).toBe("无神之明");
   });
 
   it("returns empty collections when content roots are unavailable", () => {
