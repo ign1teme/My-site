@@ -1,7 +1,7 @@
 export const novelArtwork: Record<string, { src: string; alt: string }> = {
   sodoma: {
-    src: "/images/novel-sodoma.webp",
-    alt: "浮空城市与时间阵列的插画",
+    src: "/images/novel-sodoma.png",
+    alt: "《樱色匿名信》封面：天神之明",
   },
   "spring-tide": {
     src: "/images/novel-spring-tide.webp",

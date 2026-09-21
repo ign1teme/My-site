@@ -16,7 +16,7 @@ describe("homepage", () => {
     render(<Home />);
 
     expect(screen.getByAltText("冰面将融的北方湖泊，一枝树影伸向水面")).toBeInTheDocument();
-    expect(screen.getByAltText("浮空城市与时间阵列的插画")).toBeInTheDocument();
+    expect(screen.getByAltText("《樱色匿名信》封面：天神之明")).toBeInTheDocument();
     expect(screen.getByAltText("春日融雪汇入河流的插画")).toBeInTheDocument();
   });
 });
