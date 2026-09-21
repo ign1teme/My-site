@@ -26,7 +26,7 @@ export default function Home() {
             <span>文字是枝，</span>
             <span>思想是海。</span>
           </h1>
-          <p className="hero-subtitle">记录北方日常，也写那些现实无法容纳的故事。</p>
+          <p className="hero-subtitle">记录日常，也写那些现实无法容纳的故事。</p>
           <div className="hero-actions">
             <Link className="button button--primary" href={latestPost ? `/blog/${latestPost.slug}` : "/#blog"}>
               读最新文章
