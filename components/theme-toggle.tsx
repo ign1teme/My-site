@@ -7,11 +7,11 @@ type Theme = "light" | "dark";
 function getPreferredTheme(): Theme {
   try {
     const saved = window.localStorage.getItem("theme");
-    if (saved === "light" || saved === "dark") return saved;
+    if (saved === "light") return "light";
   } catch {
-    // Storage may be disabled by privacy settings; system preference remains usable.
+    // Storage may be disabled by privacy settings; the site falls back to its dark default.
   }
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return "dark";
 }
 
 function applyTheme(theme: Theme) {
@@ -27,7 +27,7 @@ function persistTheme(theme: Theme) {
 }
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
     const preferred = getPreferredTheme();
@@ -46,7 +46,8 @@ export function ThemeToggle() {
 
   return (
     <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={label}>
-      <span aria-hidden="true">{theme === "dark" ? "夜" : "昼"}</span>
+      <span className="theme-toggle__glyph" data-shown={theme === "light"} aria-hidden="true">昼</span>
+      <span className="theme-toggle__glyph" data-shown={theme === "dark"} aria-hidden="true">夜</span>
     </button>
   );
 }

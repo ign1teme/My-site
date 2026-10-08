@@ -60,7 +60,7 @@ describe("content repository", () => {
     const chapter = await getChapter("sodoma", "001");
 
     expect(chapters.map(({ order }) => order)).toEqual([1, 2, 3]);
-    expect(chapter?.title).toContain("天堂接口");
+    expect(chapter?.title).toBe("第一章");
     expect(chapter?.content).toContain("空中花园·城西追思礼堂");
     expect(chapter?.content).toContain("我不在的时候，听说你们几条野狗很嚣张啊？");
     expect(chapter?.content).toContain("降格敕");

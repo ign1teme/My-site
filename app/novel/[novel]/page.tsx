@@ -63,7 +63,6 @@ export default async function NovelPage({ params }: NovelPageProps) {
               <Link href={`/novel/${novel}/${chapter.slug}`}>
                 <span className="chapter-num">{String(index + 1).padStart(2, "0")}</span>
                 <span>{chapter.title}</span>
-                <span aria-hidden="true">↗</span>
               </Link>
             </li>
           ))}

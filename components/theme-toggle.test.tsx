@@ -19,6 +19,7 @@ describe("ThemeToggle", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    window.localStorage.clear();
   });
 
   it("uses a saved dark theme and exposes the next action", () => {
@@ -30,22 +31,29 @@ describe("ThemeToggle", () => {
     expect(screen.getByRole("button", { name: "切换到浅色模式" })).toBeInTheDocument();
   });
 
-  it("falls back to the system preference", () => {
-    setSystemTheme(true);
-
+  it("defaults to dark even when the system prefers light", () => {
     render(<ThemeToggle />);
 
     expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+  });
+
+  it("uses a saved light theme", () => {
+    window.localStorage.setItem("theme", "light");
+
+    render(<ThemeToggle />);
+
+    expect(document.documentElement).toHaveAttribute("data-theme", "light");
+    expect(screen.getByRole("button", { name: "切换到深色模式" })).toBeInTheDocument();
   });
 
   it("switches theme and persists the choice", async () => {
     const user = userEvent.setup();
     render(<ThemeToggle />);
 
-    await user.click(screen.getByRole("button", { name: "切换到深色模式" }));
+    await user.click(screen.getByRole("button", { name: "切换到浅色模式" }));
 
-    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
-    expect(window.localStorage.getItem("theme")).toBe("dark");
+    expect(document.documentElement).toHaveAttribute("data-theme", "light");
+    expect(window.localStorage.getItem("theme")).toBe("light");
   });
 
   it("keeps working when browser storage is unavailable", async () => {
@@ -58,8 +66,8 @@ describe("ThemeToggle", () => {
     const user = userEvent.setup();
 
     render(<ThemeToggle />);
-    await user.click(screen.getByRole("button", { name: "切换到深色模式" }));
+    await user.click(screen.getByRole("button", { name: "切换到浅色模式" }));
 
-    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    expect(document.documentElement).toHaveAttribute("data-theme", "light");
   });
 });

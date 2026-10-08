@@ -10,39 +10,52 @@
 
 :root {
   color-scheme: light;
-  --canvas: oklch(0.972 0.011 78);
-  --surface: oklch(0.944 0.017 74);
-  --surface-raised: oklch(0.988 0.006 78);
-  --ink: oklch(0.225 0.018 255);
-  --ink-soft: oklch(0.43 0.019 255);
-  --ink-faint: oklch(0.49 0.014 255);
-  --line: oklch(0.84 0.018 72);
-  --line-strong: oklch(0.68 0.023 72);
-  --accent: oklch(0.50 0.13 12);
-  --accent-soft: oklch(0.91 0.045 12);
-  --focus: oklch(0.58 0.16 12);
+  --canvas: oklch(0.962 0.009 10);
+  --surface: oklch(0.935 0.014 10);
+  --surface-raised: oklch(0.984 0.005 10);
+  --ink: oklch(0.24 0.03 355);
+  --ink-soft: oklch(0.43 0.03 355);
+  --ink-faint: oklch(0.49 0.025 355);
+  --line: oklch(0.87 0.014 10);
+  --line-strong: oklch(0.71 0.025 5);
+  --accent: oklch(0.52 0.13 5);
+  --accent-soft: oklch(0.91 0.04 5);
+  --focus: oklch(0.57 0.15 5);
+  --depth-top: oklch(0.978 0.006 10);
+  --depth-bottom: oklch(0.93 0.016 5);
+  --petal: oklch(0.8 0.08 5);
+  --art-filter: none;
   --header-height: 72px;
   --page-width: 1180px;
   --reading-width: 720px;
   --radius-control: 2px;
+  --font-art: "LXGW WenKai", "Noto Serif SC", "Songti SC", serif;
   --font-display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
   --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Closed-form spring step responses sampled into linear(); both settle in ~600ms. */
+  --spring: linear(0, 0.0264, 0.0928, 0.1832, 0.2854, 0.3906, 0.4927, 0.5875, 0.6727, 0.7471, 0.8104, 0.863, 0.9057, 0.9395, 0.9656, 0.9851, 0.9991, 1.0088, 1.0149, 1.0183, 1.0198, 1.0198, 1.0188, 1.0172, 1.0152, 1.0132, 1.0111, 1.0091, 1.0073, 1.0057, 1.0044, 1.0032, 1.0023, 1.0015, 1); /* damping 0.78, ~2% overshoot */
+  --spring-calm: linear(0, 0.0161, 0.0569, 0.1133, 0.1786, 0.248, 0.3182, 0.3867, 0.452, 0.5131, 0.5696, 0.6211, 0.6678, 0.7097, 0.747, 0.7802, 0.8095, 0.8352, 0.8578, 0.8775, 0.8946, 0.9095, 0.9224, 0.9335, 0.9432, 0.9514, 0.9586, 0.9647, 0.9699, 0.9744, 0.9782, 0.9815, 0.9843, 0.9867, 1); /* critically damped */
+  --spring-duration: 600ms;
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --canvas: oklch(0.17 0.012 255);
-  --surface: oklch(0.215 0.014 255);
-  --surface-raised: oklch(0.245 0.016 255);
-  --ink: oklch(0.91 0.012 78);
-  --ink-soft: oklch(0.73 0.014 78);
-  --ink-faint: oklch(0.66 0.012 78);
-  --line: oklch(0.33 0.014 255);
-  --line-strong: oklch(0.45 0.018 255);
-  --accent: oklch(0.72 0.12 12);
-  --accent-soft: oklch(0.29 0.06 12);
-  --focus: oklch(0.78 0.11 12);
+  --canvas: oklch(0.17 0.02 350);
+  --surface: oklch(0.21 0.024 350);
+  --surface-raised: oklch(0.24 0.026 350);
+  --ink: oklch(0.93 0.012 350);
+  --ink-soft: oklch(0.78 0.02 350);
+  --ink-faint: oklch(0.7 0.02 350);
+  --line: oklch(0.31 0.024 350);
+  --line-strong: oklch(0.44 0.03 350);
+  --accent: oklch(0.78 0.1 5);
+  --accent-soft: oklch(0.34 0.07 5);
+  --focus: oklch(0.82 0.09 5);
+  --depth-top: oklch(0.215 0.028 345);
+  --depth-bottom: oklch(0.13 0.02 355);
+  --petal: oklch(0.78 0.09 5);
+  --art-filter: brightness(0.86) contrast(1.04);
 }
 
 html {
@@ -56,7 +69,8 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow-x: hidden;
-  background: var(--canvas);
+  isolation: isolate;
+  background: linear-gradient(180deg, var(--depth-top) 0, var(--canvas) 960px, var(--depth-bottom) 100%);
   color: var(--ink);
   font-family: var(--font-ui);
   line-height: 1.6;
@@ -92,6 +106,15 @@ img {
   outline-offset: 4px;
 }
 
+.petals {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 .skip-link {
   position: fixed;
   top: 8px;
@@ -115,8 +138,10 @@ img {
   top: 0;
   z-index: 50;
   height: var(--header-height);
-  border-bottom: 1px solid var(--line);
-  background: var(--canvas);
+  border-bottom: 1px solid color-mix(in oklch, var(--line) 70%, transparent);
+  background: color-mix(in oklch, var(--depth-top) 82%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
 .site-header__inner {
@@ -133,10 +158,10 @@ img {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
-  font-family: var(--font-display);
-  font-size: 1.55rem;
-  font-weight: 600;
-  letter-spacing: -0.025em;
+  font-family: var(--font-art);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
 }
 
 .site-header__actions,
@@ -153,6 +178,26 @@ img {
   gap: 4px;
   list-style: none;
   padding: 0;
+}
+
+.site-nav {
+  position: relative;
+}
+
+.nav-indicator {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0;
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+.nav-links a[aria-current="true"] {
+  color: var(--ink);
 }
 
 .nav-links a {
@@ -190,10 +235,38 @@ img {
   transition-timing-function: ease;
 }
 
-.theme-toggle span {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 0.8rem;
+.theme-toggle {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle__glyph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-art);
+  font-size: 0.95rem;
+}
+
+.theme-toggle__glyph[data-shown="false"] {
+  opacity: 0;
+  filter: blur(4px);
+  transform: translateY(45%);
+  transition:
+    opacity 140ms ease-in,
+    filter 140ms ease-in,
+    transform 140ms ease-in;
+}
+
+.theme-toggle__glyph[data-shown="true"] {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+  transition:
+    opacity 220ms ease-out 100ms,
+    filter 220ms ease-out 100ms,
+    transform var(--spring-duration) var(--spring) 100ms;
 }
 
 .reading-progress {
@@ -212,57 +285,59 @@ img {
   width: min(var(--page-width), calc(100% - 48px));
   min-height: calc(100svh - var(--header-height));
   margin-inline: auto;
-  padding-block: clamp(48px, 8vh, 88px);
+  padding-block: clamp(48px, 9vh, 104px);
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
-  align-items: center;
-  gap: clamp(48px, 8vw, 120px);
-}
-
-.hero-copy {
-  max-width: 680px;
-}
-
-.hero-kicker {
-  margin-bottom: 24px;
-  color: var(--accent);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
+  grid-template-columns: auto minmax(0, 500px) minmax(0, 1fr);
+  grid-template-areas: "title art copy";
+  align-items: end;
+  column-gap: clamp(36px, 6vw, 96px);
 }
 
 .hero-title {
-  font-family: var(--font-display);
-  font-size: clamp(3.8rem, 7vw, 6.9rem);
-  font-weight: 400;
-  line-height: 0.98;
-  letter-spacing: -0.045em;
-  text-wrap: balance;
+  grid-area: title;
+  align-self: start;
+  writing-mode: vertical-rl;
+  font-family: var(--font-art);
+  font-size: clamp(3rem, 5.2vw, 4.5rem);
+  font-weight: 300;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
 }
 
 .hero-title span {
   display: block;
 }
 
-.hero-title span:last-child {
-  color: var(--accent);
+/* The second line sits lower: the sea under the branch. */
+.hero-title span + span {
+  padding-inline-start: 1.6em;
+}
+
+.hero-art {
+  grid-area: art;
+  align-self: start;
+}
+
+.hero-copy {
+  grid-area: copy;
+  max-width: 22em;
+  padding-bottom: 6px;
 }
 
 .hero-subtitle {
-  max-width: 24em;
-  margin-top: 28px;
   color: var(--ink-soft);
   font-family: var(--font-display);
-  font-size: clamp(1rem, 1.7vw, 1.18rem);
-  line-height: 1.85;
+  font-size: clamp(1rem, 1.5vw, 1.12rem);
+  line-height: 2;
   text-wrap: pretty;
 }
 
 .hero-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 24px;
-  margin-top: 36px;
+  gap: 12px 24px;
+  margin-top: 32px;
 }
 
 .button {
@@ -312,20 +387,38 @@ img {
   object-fit: cover;
 }
 
-.hero-copy > *,
-.hero-art {
-  animation: reveal 720ms var(--ease-out) both;
+.hero-art img,
+.novel-card__art img,
+.novel-detail__art img {
+  filter: var(--art-filter);
 }
 
-.hero-copy > :nth-child(2) { animation-delay: 60ms; }
-.hero-copy > :nth-child(3) { animation-delay: 120ms; }
-.hero-copy > :nth-child(4) { animation-delay: 180ms; }
-.hero-art { animation-delay: 120ms; }
+/* One load sequence: the print surfaces, then the two lines sink into place. */
+.hero-art {
+  animation: surface 1100ms var(--ease-out) both;
+}
 
-@keyframes reveal {
+.hero-title span {
+  animation: sink 900ms var(--spring) 240ms both;
+}
+
+.hero-title span + span {
+  animation-delay: 520ms;
+}
+
+.hero-copy {
+  animation: surface 900ms var(--ease-out) 820ms both;
+}
+
+@keyframes surface {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sink {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(-0.5em);
   }
   to {
     opacity: 1;
@@ -356,18 +449,23 @@ img {
 .about-section h2,
 .chapter-section h2 {
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.4rem, 4.6vw, 4rem);
+  font-weight: 300;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
   text-wrap: balance;
 }
 
 .section-intro p {
-  max-width: 42ch;
-  margin-top: 18px;
-  color: var(--ink-soft);
+  max-width: 28em;
+  margin-top: 20px;
+  color: var(--ink);
+  font-family: var(--font-art);
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
   line-height: 1.8;
+  letter-spacing: 0.04em;
+  /* A halo in the page colour keeps the line clear when a petal drifts behind it. */
+  text-shadow: 0 0 0.5em var(--canvas), 0 0 0.15em var(--canvas);
   text-wrap: pretty;
 }
 
@@ -384,9 +482,9 @@ img {
   min-height: 152px;
   padding-block: 30px;
   border-bottom: 1px solid var(--line);
-  transition-property: color, transform;
-  transition-duration: 220ms;
-  transition-timing-function: var(--ease-out);
+  transition:
+    color 160ms ease,
+    transform var(--spring-duration) var(--spring);
 }
 
 .journal-entry time,
@@ -402,17 +500,17 @@ img {
 .journal-entry time {
   padding-top: 5px;
   color: var(--ink-faint);
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.76rem;
-  letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
 }
 
 .journal-entry__copy h3 {
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.5vw, 1.9rem);
-  font-weight: 600;
-  line-height: 1.35;
-  letter-spacing: -0.018em;
+  font-size: clamp(1.3rem, 2.3vw, 1.75rem);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
   text-wrap: balance;
 }
 
@@ -463,7 +561,7 @@ img {
   height: auto;
   aspect-ratio: 2 / 3;
   object-fit: cover;
-  transition: transform 500ms var(--ease-out);
+  transition: transform 700ms var(--spring-calm);
 }
 
 .novel-card__body {
@@ -478,6 +576,11 @@ img {
   font-size: 0.76rem;
 }
 
+.novel-card__gap {
+  display: inline-block;
+  width: 1.2em;
+}
+
 .novel-status {
   color: var(--accent);
   font-weight: 700;
@@ -486,10 +589,10 @@ img {
 .novel-card h3 {
   margin-top: 12px;
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3vw, 2.7rem);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.024em;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
 }
 
 .novel-card__body > p {
@@ -561,17 +664,18 @@ img {
   gap: 16px;
   margin-top: 44px;
   color: var(--accent);
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.76rem;
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
 }
 
 .article-header h1 {
   margin-top: 18px;
   font-family: var(--font-display);
-  font-size: clamp(2.4rem, 6vw, 4.4rem);
-  font-weight: 400;
-  line-height: 1.16;
-  letter-spacing: -0.035em;
+  font-size: clamp(2.2rem, 5.4vw, 3.8rem);
+  font-weight: 300;
+  line-height: 1.25;
+  letter-spacing: 0.03em;
   text-wrap: balance;
 }
 
@@ -671,10 +775,10 @@ img {
 .novel-detail__copy h1 {
   margin-top: 18px;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 7vw, 6rem);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+  font-size: clamp(2.8rem, 6.4vw, 5.4rem);
+  font-weight: 300;
+  line-height: 1.12;
+  letter-spacing: 0.06em;
   text-wrap: balance;
 }
 
@@ -721,15 +825,14 @@ img {
   min-height: 72px;
   padding-block: 12px;
   font-family: var(--font-display);
-  transition-property: color, transform;
-  transition-duration: 180ms;
-  transition-timing-function: var(--ease-out);
+  transition:
+    color 160ms ease,
+    transform var(--spring-duration) var(--spring);
 }
 
 .chapter-num {
   color: var(--ink-faint);
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.76rem;
+  font-size: 0.86rem;
 }
 
 .chapter-nav {
@@ -745,9 +848,9 @@ img {
   min-height: 80px;
   padding: 16px 18px;
   background: var(--surface);
-  transition-property: background-color, transform;
-  transition-duration: 180ms;
-  transition-timing-function: ease;
+  transition:
+    background-color 160ms ease,
+    transform var(--spring-duration) var(--spring);
 }
 
 .chapter-nav a:last-child {
@@ -789,9 +892,10 @@ img {
 
 .site-footer__brand {
   color: var(--ink);
-  font-family: var(--font-display);
+  font-family: var(--font-art);
   font-size: 1.3rem;
-  font-weight: 600;
+  font-weight: 400;
+  letter-spacing: 0.18em;
 }
 
 .site-footer__meta {
@@ -829,11 +933,22 @@ img {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1023px) {
   .hero {
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.82fr);
-    gap: 40px;
+    min-height: auto;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "title art"
+      ". copy";
+    row-gap: 40px;
   }
+
+  .hero-copy {
+    max-width: 30em;
+  }
+}
+
+@media (max-width: 900px) {
 
   .about-section {
     grid-template-columns: 1fr 1fr;
@@ -877,24 +992,21 @@ img {
 
   .hero {
     width: calc(100% - 32px);
-    min-height: auto;
-    padding-block: 48px 72px;
-    grid-template-columns: 1fr;
-    gap: 44px;
+    padding-block: 24px 72px;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "art art"
+      "title copy";
+    gap: 36px 24px;
   }
 
   .hero-title {
-    font-size: clamp(3rem, 15vw, 4.2rem);
-  }
-
-  .hero-subtitle {
-    margin-top: 22px;
+    font-size: clamp(2.2rem, 10vw, 2.8rem);
   }
 
   .hero-actions {
-    flex-wrap: wrap;
-    gap: 14px 20px;
-    margin-top: 28px;
+    gap: 8px 20px;
+    margin-top: 24px;
   }
 
   .hero-art img {

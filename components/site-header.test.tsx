@@ -19,6 +19,6 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("link", { name: "博客" })).toHaveAttribute("href", "/#blog");
     expect(screen.getByRole("link", { name: "小说" })).toHaveAttribute("href", "/#novel");
     expect(screen.getByRole("link", { name: "关于" })).toHaveAttribute("href", "/#about");
-    expect(screen.getByRole("button", { name: "切换到深色模式" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "切换到浅色模式" })).toBeInTheDocument();
   });
 });

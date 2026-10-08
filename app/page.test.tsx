@@ -8,8 +8,8 @@ describe("homepage", () => {
 
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("文字是枝，思想是海。");
-    expect(screen.getByRole("heading", { name: "最近写下" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "小说与长篇" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "枝头的字" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "浅海" })).toBeInTheDocument();
   });
 
   it("uses the generated editorial artwork as meaningful imagery", () => {

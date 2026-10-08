@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "枝海",
-  title: "枝海｜文字与故事",
-  description: "文字是枝，思想是海。记录北方日常、写作随想与连续的故事。",
+  title: "枝海｜湖边的文字与故事",
+  description: "文字是枝，思想是海。在芬兰的湖边记下日常、写作随想与连续的故事。",
   url: "https://hanam7.win",
 } as const;
 
