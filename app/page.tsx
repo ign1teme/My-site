@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getAllBlogPosts, getAllNovels } from "@/lib/content";
-import { novelArtwork } from "@/lib/artwork";
+import { getNovelArtwork } from "@/lib/artwork";
+
+import home from "@/content/pages/home.json";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -21,13 +23,13 @@ export default function Home() {
     <main id="main-content">
       <section className="hero" aria-labelledby="hero-title">
         <h1 id="hero-title" className="hero-title">
-          <span>文字是枝，</span>
-          <span>思想是海。</span>
+          <span>{home.hero.titleFirst}</span>
+          <span>{home.hero.titleSecond}</span>
         </h1>
         <figure className="hero-art">
           <Image
-            src="/images/hero-branch-sea.webp"
-            alt="冰面将融的北方湖泊，一枝树影伸向水面"
+            src={home.hero.image}
+            alt={home.hero.imageAlt}
             width={1122}
             height={1402}
             priority
@@ -35,7 +37,7 @@ export default function Home() {
           />
         </figure>
         <div className="hero-copy">
-          <p className="hero-subtitle">在芬兰的湖边记下日常，也写那些现实装不下的故事。</p>
+          <p className="hero-subtitle">{home.hero.subtitle}</p>
           <div className="hero-actions">
             <Link className="button button--primary" href={latestPost ? `/blog/${latestPost.slug}` : "/#blog"}>
               读最新文章
@@ -47,8 +49,8 @@ export default function Home() {
 
       <section id="blog" className="section-shell anchor-target" aria-labelledby="blog-title">
         <div className="section-intro">
-          <h2 id="blog-title">枝头的字</h2>
-          <p>短一些的日常与想法，按时间留下。</p>
+          <h2 id="blog-title">{home.blog.title}</h2>
+          <p>{home.blog.intro}</p>
         </div>
         <div className="journal-list">
           {posts.map((post) => (
@@ -66,12 +68,12 @@ export default function Home() {
 
       <section id="novel" className="section-shell novel-section anchor-target" aria-labelledby="novel-title">
         <div className="section-intro section-intro--wide">
-          <h2 id="novel-title">浅海</h2>
-          <p>日记装不下的东西，交给更长的叙事。</p>
+          <h2 id="novel-title">{home.novel.title}</h2>
+          <p>{home.novel.intro}</p>
         </div>
         <div className="novel-grid">
           {novels.map((novel) => {
-            const image = novelArtwork[novel.slug];
+            const image = getNovelArtwork(novel);
             return (
               <Link key={novel.slug} href={`/novel/${novel.slug}`} className="novel-card">
                 {image && (
@@ -101,13 +103,11 @@ export default function Home() {
 
       <section id="about" className="section-shell about-section anchor-target" aria-labelledby="about-title">
         <div>
-          <h2 id="about-title">关于枝海</h2>
-          <p className="about-lede">写字的人，偶尔发呆，住在北方。</p>
+          <h2 id="about-title">{home.about.title}</h2>
+          <p className="about-lede">{home.about.lede}</p>
         </div>
         <div className="about-copy">
-          <p>拉彭兰塔的冬天很长，Saimaa 湖要冻上大半年。湖面看上去一动不动，冰下的水其实一直在走。</p>
-          <p>枝海放的就是冰面以下的东西：博客记录碎片化的日常与想法，小说是那些日记装不下的、更长的叙事。</p>
-          <p>如果你读到了什么喜欢的，那就太好了。</p>
+          {home.about.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
         </div>
       </section>
     </main>

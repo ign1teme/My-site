@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllNovelSlugs, getNovelChapters, getNovelMeta } from "@/lib/content";
-import { novelArtwork } from "@/lib/artwork";
+import { getNovelArtwork } from "@/lib/artwork";
 
 type NovelPageProps = {
   params: Promise<{ novel: string }>;
@@ -36,7 +36,7 @@ export default async function NovelPage({ params }: NovelPageProps) {
   if (!meta) notFound();
 
   const chapters = getNovelChapters(novel);
-  const image = novelArtwork[novel];
+  const image = getNovelArtwork({ ...meta, slug: novel });
 
   return (
     <main id="main-content" className="novel-detail">

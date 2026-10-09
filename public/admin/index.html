@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="same-origin">
+    <title>枝海 · 内容后台</title>
+    <link rel="stylesheet" href="/admin/admin.css">
+    <script src="/admin/bootstrap.js" type="module"></script>
+  </head>
+  <body>
+    <main id="welcome" class="welcome">
+      <a class="brand" href="/">枝海 <span>内容工作台</span></a>
+      <p class="eyebrow">文字，从这里出发</p>
+      <h1>把心思留给写作。</h1>
+      <p class="intro">写文章、续章节、换封面。在这里整理文字，准备好了，就发布。</p>
+      <p id="status" class="status" role="status">正在打开内容后台…</p>
+      <section id="setup" hidden>
+        <h2>首次使用，连接你的 GitHub 账号</h2>
+        <p>后台已经就绪。完成一次授权配置后，就可以直接在这里管理网站内容。</p>
+        <ol>
+          <li>在 GitHub 创建 OAuth App，将回调地址设为 <code id="callback-url"></code>。</li>
+          <li>在 Vercel 项目设置中填写 <code>GITHUB_CLIENT_ID</code> 和 <code>GITHUB_CLIENT_SECRET</code>。</li>
+          <li>确认仓库与生产分支配置，重新部署，然后回到这里登录。</li>
+        </ol>
+        <p class="note">详细步骤见项目中的 <code>docs/admin-setup.md</code>。密钥只填写在 Vercel 的环境变量中。</p>
+        <a id="demo-link" class="button" href="?demo=1" hidden>先体验编辑器</a>
+      </section>
+      <section id="load-error" hidden>
+        <p>请检查网络连接后重试。如果持续出现，请检查后台配置。</p>
+        <button type="button" onclick="window.location.reload()">重新加载</button>
+      </section>
+      <a class="back" href="/">← 返回枝海</a>
+    </main>
+    <aside id="demo-notice" hidden>本地体验 · 内容只用于演示，不会发布到网站。<a href="/admin/index.html">退出体验</a></aside>
+    <noscript>请启用 JavaScript 以使用可视化编辑器。</noscript>
+  </body>
+</html>

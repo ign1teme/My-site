@@ -1,0 +1,45 @@
+:root { color-scheme: light; --paper: #f7f3eb; --ink: #262a30; --accent: #94424e; }
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif; }
+[hidden] { display: none !important; }
+.welcome { max-width: 760px; margin: 0 auto; padding: 64px 32px; line-height: 1.8; }
+.brand { display: flex; align-items: center; gap: 18px; text-decoration: none; font-family: "Noto Serif SC", "Songti SC", serif; font-size: 28px; color: var(--ink); }
+.brand span { color: #68605a; font: 13px sans-serif; letter-spacing: .12em; }
+.eyebrow { margin-top: 76px; color: var(--accent); font-size: 13px; letter-spacing: .12em; }
+h1 { font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(30px, 5vw, 42px); font-weight: 400; letter-spacing: -.035em; line-height: 1.35; }
+h2 { font-size: 19px; font-weight: 600; }
+.intro { max-width: 460px; color: #625e59; }
+.status { min-height: 30px; margin: 32px 0; color: var(--accent); }
+#setup, #load-error { padding: 24px; background: #fffdf9; box-shadow: 0 2px 8px #262a3012; }
+ol { padding-left: 22px; } li + li { margin-top: 12px; }
+code { overflow-wrap: anywhere; font-size: 12px; background: #ece7de; padding: 3px 5px; }
+.note { font-size: 13px; color: #68605a; }
+.button, button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; background: var(--ink); color: var(--paper); border: 0; border-radius: 2px; padding: 10px 18px; text-decoration: none; font: inherit; cursor: pointer; transition: transform 150ms; }
+.button:active, button:active { transform: scale(.96); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.back { display: inline-block; margin-top: 32px; color: var(--ink); }
+#demo-notice { position: fixed; z-index: 99999; bottom: 0; left: 0; right: 0; background: #262a30; color: #f7f3eb; padding: 9px 16px; font-size: 12px; text-align: center; }
+#demo-notice a { color: #f7f3eb; margin-left: 12px; }
+@media (max-width: 500px) { .welcome { padding: 28px 20px; } .eyebrow { margin-top: 48px; } #setup { padding: 18px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+
+/* Decap 3.15.1's editor has an 800px minimum. Stack its panes on phones.
+   Target the bundled Emotion component labels, not generated hash names. */
+@media (max-width: 767px) {
+  #nc-root [class*="-EditorContainer"] { min-width: 0 !important; width: 100%; height: 100dvh; padding-top: 0; display: flex; flex-direction: column; }
+  #nc-root [class*="-EditorContainer"] > [class*="-ToolbarContainer"] { position: relative; min-width: 0; width: 100%; height: auto; flex-wrap: wrap; flex-shrink: 0; }
+  #nc-root [class*="-ToolbarSectionBackLink"] { order: 1; flex: 1; min-width: 0; height: 54px; }
+  #nc-root [class*="-ToolbarSectionMeta"] { order: 2; height: 54px; }
+  #nc-root [class*="-ToolbarSectionMeta"] [class*="-AppHeaderSiteLink"] { display: none; }
+  #nc-root [class*="-ToolbarSectionMain"] { order: 3; flex: 1 0 100%; height: auto; min-height: 54px; padding: 6px 8px; gap: 8px; flex-wrap: wrap; }
+  #nc-root [class*="-ToolbarSubSectionFirst"] { height: auto; flex-wrap: wrap; gap: 6px; }
+  #nc-root [class*="-ToolbarSectionMain"] [class*="-buttonMargin"] { margin: 0; }
+  #nc-root [class*="-ToolbarSectionMain"] button { padding-left: 10px; padding-right: 10px; }
+  #nc-root [class*="-EditorContainer"] > [class*="-Editor "] { width: 100%; height: auto; flex: 1; min-height: 0; }
+  #nc-root .SplitPane { flex-direction: column !important; overflow-y: auto; padding-bottom: 50px; }
+  #nc-root .SplitPane > .Pane { width: 100% !important; height: auto !important; flex: none !important; }
+  #nc-root .SplitPane > .Pane2 { min-height: 420px; }
+  #nc-root .SplitPane .Resizer, #nc-root [class*="-ViewControls"] { display: none; }
+  #nc-root [class*="-PreviewPaneContainer"] { height: auto; overflow: visible; }
+  #nc-root [class*="-PreviewPaneFrame"] { height: 420px; }
+}

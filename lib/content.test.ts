@@ -13,6 +13,22 @@ import {
 } from "./content";
 
 describe("content repository", () => {
+  it('normalizes the unquoted YAML dates written by the visual editor', async () => {
+    vi.spyOn(fs, 'existsSync').mockReturnValue(true);
+    vi.spyOn(fs, 'readdirSync').mockReturnValue(['cms-entry.md'] as never);
+    vi.spyOn(fs, 'readFileSync').mockReturnValue('---\ntitle: 后台文章\ndate: 2026-10-04\n---\n正文' as never);
+    expect(getAllBlogPosts()[0].date).toBe('2026-10-04');
+    await expect(getBlogPost('cms-entry')).resolves.toMatchObject({ date: '2026-10-04' });
+  });
+  it('rejects filesystem traversal through public route parameters', async () => {
+    await expect(getBlogPost('../README')).resolves.toBeNull();
+    await expect(getChapter('sodoma', '../meta')).resolves.toBeNull();
+    await expect(getChapter('..', '001')).resolves.toBeNull();
+    expect(getNovelMeta('../blog')).toBeNull();
+    expect(getNovelChapters('..\\blog')).toEqual([]);
+    expect(getAllChapterSlugs('..')).toEqual([]);
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });

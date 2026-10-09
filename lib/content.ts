@@ -5,6 +5,11 @@ import { remark } from 'remark';
 import html from 'remark-html';
 
 const contentDir = path.join(process.cwd(), 'content');
+const validSlug = (slug: string) => Boolean(slug) && !/[\/\\.\0]/.test(slug);
+function contentDate(value: unknown): string {
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? '' : value.toISOString().slice(0, 10);
+  return typeof value === 'string' ? value : '';
+}
 
 // ── Blog ──
 
@@ -29,7 +34,7 @@ export function getAllBlogPosts(): Omit<BlogPost, 'content'>[] {
       return {
         slug: filename.replace('.md', ''),
         title: data.title || '',
-        date: data.date || '',
+        date: contentDate(data.date),
         tag: data.tag || '',
         excerpt: data.excerpt || '',
       };
@@ -38,6 +43,7 @@ export function getAllBlogPosts(): Omit<BlogPost, 'content'>[] {
 }
 
 export async function getBlogPost(slug: string): Promise<BlogPost | null> {
+  if (!validSlug(slug)) return null;
   const filePath = path.join(contentDir, 'blog', `${slug}.md`);
   if (!fs.existsSync(filePath)) return null;
 
@@ -48,7 +54,7 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
   return {
     slug,
     title: data.title || '',
-    date: data.date || '',
+    date: contentDate(data.date),
     tag: data.tag || '',
     excerpt: data.excerpt || '',
     content: processed.toString(),
@@ -72,6 +78,8 @@ export interface NovelMeta {
   slug: string;
   chapterCount: number;
   wordCount: string;
+  cover?: string;
+  coverAlt?: string;
 }
 
 export interface Chapter {
@@ -86,7 +94,7 @@ export function getAllNovels(): NovelMeta[] {
   if (!fs.existsSync(dir)) return [];
 
   const novelDirs = fs.readdirSync(dir).filter(d =>
-    fs.statSync(path.join(dir, d)).isDirectory()
+    fs.statSync(path.join(dir, d)).isDirectory() && fs.existsSync(path.join(dir, d, 'meta.json'))
   );
 
   return novelDirs.map(novelSlug => {
@@ -118,6 +126,7 @@ export function getAllNovels(): NovelMeta[] {
 }
 
 export function getNovelChapters(novelSlug: string): Omit<Chapter, 'content'>[] {
+  if (!validSlug(novelSlug)) return [];
   const dir = path.join(contentDir, 'novel', novelSlug);
   if (!fs.existsSync(dir)) return [];
 
@@ -137,6 +146,7 @@ export function getNovelChapters(novelSlug: string): Omit<Chapter, 'content'>[] 
 }
 
 export async function getChapter(novelSlug: string, chapterSlug: string): Promise<Chapter | null> {
+  if (!validSlug(novelSlug) || !validSlug(chapterSlug)) return null;
   const filePath = path.join(contentDir, 'novel', novelSlug, `${chapterSlug}.md`);
   if (!fs.existsSync(filePath)) return null;
 
@@ -153,6 +163,7 @@ export async function getChapter(novelSlug: string, chapterSlug: string): Promis
 }
 
 export function getNovelMeta(novelSlug: string): Omit<NovelMeta, 'chapterCount' | 'wordCount'> | null {
+  if (!validSlug(novelSlug)) return null;
   const metaPath = path.join(contentDir, 'novel', novelSlug, 'meta.json');
   if (!fs.existsSync(metaPath)) return null;
   return JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
@@ -162,11 +173,12 @@ export function getAllNovelSlugs(): string[] {
   const dir = path.join(contentDir, 'novel');
   if (!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir).filter(d =>
-    fs.statSync(path.join(dir, d)).isDirectory()
+    fs.statSync(path.join(dir, d)).isDirectory() && fs.existsSync(path.join(dir, d, 'meta.json'))
   );
 }
 
 export function getAllChapterSlugs(novelSlug: string): string[] {
+  if (!validSlug(novelSlug)) return [];
   const dir = path.join(contentDir, 'novel', novelSlug);
   if (!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir)
