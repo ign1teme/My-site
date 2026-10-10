@@ -92,7 +92,7 @@ export async function finishAuthorization(request: Request): Promise<Response> {
       return error('当前 GitHub 账号没有此网站仓库的写入权限。请使用站点管理员账号登录。', 403, origin);
     }
     const nonce = randomBytes(16).toString('base64');
-    const message = `authentication:github:success:${JSON.stringify({ token: result.access_token, provider: 'github' })}`;
+    const message = `authorization:github:success:${JSON.stringify({ token: result.access_token, provider: 'github' })}`;
     // Escape inline-script delimiters even if the provider ever returns unexpected token characters.
     const literal = (value: string) => JSON.stringify(value).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
     const html = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="referrer" content="no-referrer"><title>枝海 · 登录完成</title><body><p>登录完成，正在返回内容后台。若窗口未自动关闭，请返回后台重新登录，并允许弹出窗口。</p><script nonce="${nonce}">

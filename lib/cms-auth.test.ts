@@ -1,6 +1,8 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { startAuthorization, finishAuthorization } from './cms-auth';
+import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 
 describe('CMS GitHub authorization', () => {
   beforeEach(() => {
@@ -59,9 +61,38 @@ describe('CMS GitHub authorization', () => {
     expect(html).toContain('https://hanam7.win');
     expect(html).toContain('event.source !== window.opener');
     expect(html).toContain('event.origin !== origin');
-    expect(html).toContain('authentication:github:success:');
+    expect(html).toContain('authorization:github:success:');
     expect(html).not.toContain('test-secret-only');
     expect(fetchMock.mock.calls[1][0]).toBe('https://api.github.com/repos/ign1teme/My-site');
+  });
+  it('delivers a login result accepted by the bundled Decap client', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(Response.json({ access_token: 'test-access-token' }))
+      .mockResolvedValueOnce(Response.json({ permissions: { push: true } })));
+    const { state, cookie } = await begin();
+    const response = await finishAuthorization(callback(state, cookie));
+    const html = await response.text();
+    const script = html.match(/<script nonce="[^"]+">([\s\S]*?)<\/script>/)![1];
+    const opener = { postMessage: vi.fn() };
+    let receive: (event: object) => void = () => {};
+    const popup = { opener, close: vi.fn(), removeEventListener: vi.fn(), addEventListener: (_: string, handler: typeof receive) => { receive = handler; } };
+    runInNewContext(script, { window: popup });
+    expect(opener.postMessage).toHaveBeenCalledWith('authorizing:github', 'https://hanam7.win');
+    receive({ origin: 'https://evil.example', source: opener, data: 'authorizing:github' });
+    receive({ origin: 'https://hanam7.win', source: {}, data: 'authorizing:github' });
+    expect(opener.postMessage).toHaveBeenCalledTimes(1);
+    receive({ origin: 'https://hanam7.win', source: opener, data: 'authorizing:github' });
+
+    // Exercise the actual pinned client's receiver, not a second copy of our protocol.
+    const bundle = readFileSync('public/admin/vendor/decap-cms-3.15.1.js', 'utf8');
+    const start = bundle.indexOf('authorizeCallback(e,t){');
+    const end = bundle.indexOf('getSiteID(){', start);
+    expect(start).toBeGreaterThan(0);
+    const client = runInNewContext(`new (class { ${bundle.slice(start, end)} })()`, { window: { removeEventListener: vi.fn() } });
+    client.base_url = 'https://hanam7.win';
+    client.authWindow = popup;
+    const onLogin = vi.fn();
+    client.authorizeCallback({ provider: 'github' }, onLogin)({ origin: 'https://hanam7.win', data: opener.postMessage.mock.calls[1][0] });
+    expect(onLogin).toHaveBeenCalledWith(null, { token: 'test-access-token', provider: 'github' });
   });
   it('rejects users without write access without returning the token', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(Response.json({ access_token: 'private-token' }))
